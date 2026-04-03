@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyCast AI Pro | Ultimate Weather Platform</title>
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body class="weather-default">
+
+    <div class="bg-animations">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div id="weatherAnimation"></div>
+
+    <div class="container">
+        <div class="header-info">
+            <h3 id="liveClock">00:00:00</h3>
+            <p id="liveDate">Loading...</p>
+        </div>
+
+        <h1 class="logo">SkyCast <span>AI Pro</span></h1>
+
+        <div class="input-section">
+            <div class="search-bar" style="position: relative;">
+                <input type="text" id="cityInput" placeholder="Enter city or village..." oninput="showSuggestions(this.value)" autocomplete="off">
+                <button onclick="getWeather()" id="btn-analyze" style="background:#3b82f6">Analyze</button>
+                
+                <div id="suggestions" class="suggestions-list"></div>
+            </div>
+            
+            <div id="voiceStatus"></div>
+            
+            <div class="button-grid">
+                <button onclick="voiceSearch()" id="micButton" style="background:#8b5cf6">🎤 Voice AI Assistant</button>
+                <button onclick="getLocationWeather()" id="btn-location">📍 Geo-Locate</button>
+                <button onclick="speakWeather()" id="btn-speak">🔊 Audio Feed</button>
+                <button onclick="addFavorite()" id="btn-fav">⭐ Bookmark</button>
+                <button onclick="downloadWeather()" id="btn-download">📸 Export Report</button>
+                <button onclick="stopWeatherVoice()" style="background:#ef4444" id="btn-stop">⛔ Mute AI</button>
+            </div>
+        </div>
+
+        <div id="weatherMain">
+            <h2 id="cityName" style="margin-top:25px; font-size: 2rem;">Ready for Input</h2>
+            <p id="greeting" style="opacity: 0.6; font-style: italic;"></p>
+            <img id="weatherIcon" src="" style="width: 120px;">
+            <p id="temperature" style="font-size: 4rem; font-weight: 900;"></p>
+            
+            <div id="extraWeather" class="stats-grid"></div>
+            <p id="aqi" style="font-weight: 800; color: #3b82f6; text-transform: uppercase; letter-spacing: 1px;"></p>
+            
+            <div style="margin: 15px 0; font-weight: 600;">
+                <span id="humidity" style="margin-right: 20px;"></span>
+                <span id="wind" style="margin-left: 20px;"></span>
+            </div>
+        </div>
+
+        <div id="aiSuggestions" class="ai-suggestion-box"></div>
+        <div id="weatherAdvice" class="precaution-grid"></div>
+
+        <div class="forecast-section" style="margin-top: 40px;">
+            <h3 style="margin-bottom: 15px;">Advanced 5-Day Trend</h3>
+            <div id="forecastContainer" class="forecast-shelf"></div>
+            <div class="chart-container">
+                <canvas id="forecastChart"></canvas>
+            </div>
+        </div>
+
+        <div id="favoriteCities" style="margin-top: 25px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;"></div>
+    </div>
+
+    <div class="visual-suite">
+        <div class="map-card">
+            <h3>Live Atmospheric Radar</h3>
+            <div id="radarMap"></div>
+            <p id="coordinates" style="margin-top: 15px; font-size: 14px; font-weight: bold;">Coordinates: 0.00°N, 0.00°E</p>
+        </div>
+
+        <div class="globe-card">
+            <h3>3D GLOBAL SATELLITE FEED</h3>
+            <div class="globe-wrapper">
+                <canvas id="earthCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <audio id="rainSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_7bde0e5b44.mp3"></audio>
+    <audio id="windSound" src="https://cdn.pixabay.com/audio/2022/03/10/audio_3c3c7f8c10.mp3"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,443 @@
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+    }
+
+    body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    overflow-x: hidden;
+    transition: background 1.5s ease;
+    background: #0f172a;
+    }
+
+    body.weather-default {
+    background: #0f172a;
+    }
+    body.weather-clear {
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    }
+    body.weather-rain {
+    background: linear-gradient(135deg, #0f172a, #334155);
+    }
+    body.weather-clouds {
+    background: linear-gradient(135deg, #374151, #1f2937);
+    }
+    body.weather-mist {
+    background: linear-gradient(135deg, #475569, #1e293b);
+    }
+    body.weather-snow {
+    background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+    }
+
+    .bg-animations {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    filter: blur(80px);
+    }
+    .orb {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.4;
+    animation: float 20s infinite alternate;
+    }
+    .orb-1 {
+    width: 400px;
+    height: 400px;
+    background: #3b82f6;
+    top: -10%;
+    left: -10%;
+    }
+    .orb-2 {
+    width: 500px;
+    height: 500px;
+    background: #8b5cf6;
+    bottom: -10%;
+    right: -10%;
+    }
+    .orb-3 {
+    width: 300px;
+    height: 300px;
+    background: #06b6d4;
+    top: 40%;
+    left: 30%;
+    }
+    @keyframes float {
+    to {
+        transform: translate(100px, 50px) scale(1.1);
+    }
+    }
+
+    .container {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(25px);
+    padding: 30px;
+    border-radius: 30px;
+    width: 95%;
+    max-width: 800px;
+    margin-top: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+    z-index: 1;
+    text-align: center;
+    }
+
+    .logo span {
+    color: #3b82f6;
+    font-weight: 900;
+    }
+
+    #voiceStatus {
+    height: 25px;
+    color: #3b82f6;
+    font-size: 14px;
+    font-weight: bold;
+    margin: 10px 0;
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+    }
+    #micButton.listening {
+    background: #ef4444 !important;
+    animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 15px rgba(239, 68, 68, 0);
+    }
+    }
+
+    .search-bar {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    position: relative;
+    }
+    .search-bar input {
+    padding: 15px 25px;
+    width: 280px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    color: white;
+    outline: none;
+    transition: 0.4s;
+    }
+    .search-bar input:focus {
+    width: 350px;
+    border-color: #3b82f6;
+    }
+
+    .suggestions-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: rgba(15, 23, 42, 0.98);
+    backdrop-filter: blur(15px);
+    border-radius: 12px;
+    margin-top: 8px;
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 2000;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .suggestion-item {
+    padding: 12px 20px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: 0.2s;
+    }
+    .suggestion-item:hover {
+    background: rgba(59, 130, 246, 0.3);
+    padding-left: 25px;
+    }
+    .suggestion-item span {
+    display: block;
+    font-size: 11px;
+    opacity: 0.6;
+    }
+
+    .button-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+    }
+
+    button,
+    .plus-box,
+    .back-box {
+    padding: 12px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    background: linear-gradient(
+        135deg,
+        rgba(59, 130, 246, 0.4),
+        rgba(37, 99, 235, 0.4)
+    );
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3),
+        inset 0 0 10px rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    }
+
+    button:hover {
+    transform: translateY(-8px) scale(1.04);
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 15px 30px rgba(59, 130, 246, 0.5),
+        0 0 20px rgba(139, 92, 246, 0.4);
+    }
+
+    button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    transition: 0.6s;
+    }
+    button:hover::before {
+    left: 100%;
+    }
+
+    .back-box {
+    background: linear-gradient(
+        135deg,
+        rgba(239, 68, 68, 0.5),
+        rgba(185, 28, 28, 0.5)
+    ) !important;
+    border-color: rgba(239, 68, 68, 0.4) !important;
+    }
+    .back-box:hover {
+    box-shadow: 0 10px 25px rgba(239, 68, 68, 0.6) !important;
+    }
+
+    .ai-suggestion-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 25px;
+    }
+    .ai-card {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    padding: 15px;
+    border-radius: 18px;
+    text-align: left;
+    }
+
+    .aqi-premium-box {
+    background: linear-gradient(
+        135deg,
+        rgba(168, 85, 247, 0.3),
+        rgba(59, 130, 246, 0.3)
+    ) !important;
+    border: 2px solid rgba(168, 85, 247, 0.6) !important;
+    box-shadow: 0 8px 32px 0 rgba(168, 85, 247, 0.4) !important;
+    backdrop-filter: blur(15px);
+    animation: luxuryGlow 3s infinite ease-in-out;
+    }
+    @keyframes luxuryGlow {
+    0%,
+    100% {
+        transform: scale(1);
+        box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
+    }
+    50% {
+        transform: scale(1.03);
+        box-shadow: 0 8px 35px rgba(168, 85, 247, 0.6);
+    }
+    }
+
+    .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin: 25px 0;
+    }
+    .stats-grid div {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 10px;
+    border-radius: 12px;
+    }
+
+    .chart-container {
+    margin-top: 25px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 20px;
+    height: 320px;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .forecast-shelf {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding: 20px 5px;
+    scrollbar-width: none;
+    }
+    .forecast-card {
+    min-width: 110px;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 15px;
+    border-radius: 20px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: all 0.4s ease;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    }
+    .forecast-card:hover {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: #3b82f6;
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 12px 40px rgba(59, 130, 246, 0.4);
+    }
+
+    .visual-suite {
+    width: 95%;
+    max-width: 950px;
+    margin: 40px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    }
+    .globe-card {
+    background: rgba(15, 23, 42, 0.85);
+    padding: 40px 20px;
+    border-radius: 30px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .globe-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 450px;
+    overflow: hidden;
+    }
+    #earthCanvas {
+    border-radius: 20px;
+    cursor: grab;
+    }
+
+    #radarMap {
+    height: 400px;
+    border-radius: 20px;
+    border: 1px solid #3b82f6;
+    }
+
+    #weatherAnimation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    }
+    .rain-drop {
+    position: absolute;
+    width: 2px;
+    height: 25px;
+    background: rgba(255, 255, 255, 0.4);
+    animation: fall linear infinite;
+    }
+    .snow-flake {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: fall linear infinite;
+    }
+    .cloud-particle {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    filter: blur(30px);
+    animation: drift linear infinite;
+    }
+    .sun-ray {
+    position: absolute;
+    top: -10%;
+    left: 50%;
+    width: 2px;
+    height: 120vh;
+    background: linear-gradient(to bottom, rgba(255, 255, 150, 0.2), transparent);
+    transform-origin: top;
+    animation: rotateRay 25s linear infinite;
+    }
+
+    @keyframes fall {
+    to {
+        transform: translateY(110vh);
+    }
+    }
+    @keyframes drift {
+    from {
+        transform: translateX(-20vw);
+    }
+    to {
+        transform: translateX(120vw);
+    }
+    }
+    @keyframes rotateRay {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+    }
+
+    @media (max-width: 768px) {
+    .container {
+        width: 98%;
+        padding: 15px;
+    }
+    .search-bar {
+        flex-direction: column;
+    }
+    .ai-suggestion-box {
+        grid-template-columns: 1fr;
+    }
+    .globe-wrapper {
+        height: 300px;
+    }
+    #temperature {
+        font-size: 3rem !important;
+    }
+    }
