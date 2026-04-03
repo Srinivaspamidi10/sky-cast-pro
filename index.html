@@ -14,6 +14,10 @@
 </head>
 <body class="weather-default">
 
+<div class="header-logo-container">
+        <img src="https://ratty-copper-62vf7oxqtb.edgeone.app/Gemini_Generated_Image_vtz3pxvtz3pxvtz3.png" alt="NaniCast AI PRO Logo">
+    </div>
+
     <div class="bg-animations">
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
@@ -34,7 +38,6 @@
             <div class="search-bar" style="position: relative;">
                 <input type="text" id="cityInput" placeholder="Enter city or village..." oninput="showSuggestions(this.value)" autocomplete="off">
                 <button onclick="getWeather()" id="btn-analyze" style="background:#3b82f6">Analyze</button>
-                
                 <div id="suggestions" class="suggestions-list"></div>
             </div>
             
@@ -69,7 +72,12 @@
         <div id="weatherAdvice" class="precaution-grid"></div>
 
         <div class="forecast-section" style="margin-top: 40px;">
-            <h3 style="margin-bottom: 15px;">Advanced 5-Day Trend</h3>
+            <h3 style="margin-bottom: 15px;">Hourly Insights (Next 24 Hours)</h3>
+            <div id="hourlyForecastContainer" class="forecast-shelf"></div>
+        </div>
+
+        <div class="forecast-section" style="margin-top: 40px;">
+            <h3 style="margin-bottom: 15px;">Advanced 7-Day Trend</h3>
             <div id="forecastContainer" class="forecast-shelf"></div>
             <div class="chart-container">
                 <canvas id="forecastChart"></canvas>
