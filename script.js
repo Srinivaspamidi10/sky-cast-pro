@@ -2,8 +2,8 @@ const apiKey = "4a205f20b30c0fd05114aa2c4bd713d7";
 let currentSpeech = null;
 let forecastData = [];
 let globe, clouds, aura, sunLight, renderer, scene, camera, marker;
-let searchTimer; 
-let currentViewWeek = 0; 
+let searchTimer;
+let currentViewWeek = 0;
 
 window.onload = () => {
     updateTime();
@@ -32,6 +32,7 @@ function updateTime() {
         day: 'numeric'
     });
 }
+
 async function showSuggestions(query) {
     const box = document.getElementById("suggestions");
 
@@ -141,7 +142,7 @@ function voiceSearch() {
         let city = cmd.replace("search", "").replace("weather in", "").replace("weather for", "").trim();
         if (city) {
             const displayCity = city.charAt(0).toUpperCase() + city.slice(1);
-            searchBar.value = displayCity; // Update search bar text immediately
+            searchBar.value = displayCity;
             status.innerText = `Recognized: "${displayCity}"`;
             getWeather();
         }
@@ -161,7 +162,7 @@ function getWeather() {
         .then(data => {
             if (data.cod === 200) {
                 data.name = inputVal.includes(',') ? inputVal : data.name;
-                data.pop = 0; // Current weather API doesn't provide POP, initializing to 0
+                data.pop = 0;
                 updateUI(data);
                 getForecast(query);
                 updateGlobeEnvironment(data.coord.lat, data.coord.lon, data.main.temp, data.timezone);
@@ -212,10 +213,11 @@ function showForecastDetail(index) {
         behavior: 'smooth'
     });
 }
+
 function updateGlobeEnvironment(lat, lon, temp, timezoneOffset) {
     if (!globe || !aura || !sunLight) return;
     globe.lastLat = lat;
-    globe.lastLon = lon; 
+    globe.lastLon = lon;
 
     const phi = (90 - lat) * (Math.PI / 180);
     const theta = (lon + 180) * (Math.PI / 180);
@@ -309,19 +311,41 @@ async function fetchAQI(lat, lon) {
     }
 }
 
+// UPDATED getForecast to include Hourly Weather Report with specific styling
 function getForecast(city) {
     const header = document.querySelector(".forecast-section h3");
-    if (header) header.innerText = "7 Days Trend";
+    if (header) header.innerText = "Weather Trends";
 
     fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`)
         .then(res => res.json())
         .then(data => {
+            // 1. Hourly Section (Next 24 Hours)
+            const hourlyContainer = document.getElementById("hourlyForecastContainer");
+            if (hourlyContainer) {
+                hourlyContainer.innerHTML = "";
+                const hourlyData = data.list.slice(0, 8); // Next 8 intervals (24 hours)
+                hourlyData.forEach((item, index) => {
+                    const time = new Date(item.dt * 1000).getHours();
+                    const ampm = time >= 12 ? 'PM' : 'AM';
+                    const displayTime = time % 12 || 12;
+
+                    // Specific label for current hour
+                    const label = (index === 0) ? "NOW" : `${displayTime} ${ampm}`;
+
+                    hourlyContainer.innerHTML += `
+                        <div class="hourly-card">
+                            <h4>${label}</h4>
+                            <img src="https://openweathermap.org/img/wn/${item.weather[0].icon}.png">
+                            <p>${Math.round(item.main.temp)}°</p>
+                        </div>`;
+                });
+            }
+
+            // 2. Daily Section (Original 5-Day Trend)
             const shelf = document.getElementById("forecastContainer");
             shelf.innerHTML = "";
             currentViewWeek = 0;
-
             forecastData = data.list.filter(item => item.dt_txt.includes("12:00:00"));
-
             renderForecastCards(forecastData);
 
             const plusBox = document.createElement("div");
@@ -357,14 +381,12 @@ function renderForecastCards(days) {
 function updateToNextWeek(city) {
     currentViewWeek++;
     const shelf = document.getElementById("forecastContainer");
-    shelf.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:20px; color:#3b82f6;">Synchronizing Next Week's AI Forecast...</div>`;
+    shelf.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:20px; color:#3b82f6;">Synchronizing AI Projections...</div>`;
 
     setTimeout(() => {
         shelf.innerHTML = "";
-
         const backBox = document.createElement("div");
         backBox.className = "forecast-card back-box";
-        backBox.style.cssText = "border: 2px solid #ef4444; cursor: pointer; order: -1; z-index: 10;";
         backBox.innerHTML = `<h4>←</h4><p>Back</p>`;
         backBox.onclick = (e) => {
             e.stopPropagation();
@@ -383,68 +405,24 @@ function updateToNextWeek(city) {
             const label = futureDate.toLocaleDateString('en', {
                 weekday: 'short'
             });
-            const dateNum = futureDate.getDate();
             const simulatedTemp = 20 + Math.floor(Math.random() * 10);
-            const simulatedPop = Math.random(); // 0 to 1
+            const simulatedPop = Math.random();
 
             const futureCard = document.createElement("div");
             futureCard.className = "forecast-card";
-            futureCard.style.cssText = "border-color: #10b981; cursor: pointer;";
+            futureCard.style.borderColor = "#10b981";
             futureCard.innerHTML = `
-                <small>Auto Update</small>
-                <h4>${label} ${dateNum}</h4>
-                <span style="font-size:2em;">🌤️</span>
+                <small>AI Trend</small>
+                <h4>${label}</h4>
+                <span style="font-size:1.5em;">🌤️</span>
                 <p>${simulatedTemp}°</p>
                 <small style="color: #60a5fa;">Rain: ${Math.round(simulatedPop * 100)}%</small>
             `;
-
-            futureCard.onclick = () => {
-                const mockDayData = {
-                    name: document.getElementById("cityName").innerText,
-                    main: {
-                        temp: simulatedTemp,
-                        feels_like: simulatedTemp - 1,
-                        humidity: 55,
-                        pressure: 1013
-                    },
-                    weather: [{
-                        main: simulatedPop > 0.4 ? "Rain" : "Clear",
-                        icon: simulatedPop > 0.4 ? "10d" : "01d"
-                    }],
-                    wind: {
-                        speed: 4.2
-                    },
-                    visibility: 10000,
-                    coord: {
-                        lat: globe.lastLat || 0,
-                        lon: globe.lastLon || 0
-                    },
-                    pop: simulatedPop
-                };
-                updateUI(mockDayData);
-                document.getElementById("greeting").innerText = `AI Projection: ${label}`;
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            };
-
             shelf.appendChild(futureCard);
             nextWeekLabels.push(label);
             nextWeekTemps.push(simulatedTemp);
         }
-
-        const plusBox = document.createElement("div");
-        plusBox.className = "forecast-card plus-box";
-        plusBox.innerHTML = `<h4>+</h4><p>Next 7 Days</p>`;
-        plusBox.onclick = () => updateToNextWeek(city);
-        shelf.appendChild(plusBox);
-
         drawWeatherGraph(nextWeekLabels, nextWeekTemps);
-        shelf.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest'
-        });
     }, 800);
 }
 
@@ -527,7 +505,6 @@ function initEarth() {
     sunLight.position.set(5, 3, 5);
     scene.add(sunLight);
     scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-
     camera.position.z = 5;
 
     function animate() {
@@ -549,7 +526,6 @@ function speakWeather() {
     const fullLocation = document.getElementById("cityName").innerText;
     const shortName = fullLocation.split(',')[0].trim();
     const temp = document.getElementById("temperature").innerText;
-
     if (shortName === "" || shortName.includes("Ready")) return;
 
     const aiCards = document.querySelectorAll(".ai-card small");
@@ -557,7 +533,6 @@ function speakWeather() {
     if (aiCards.length >= 3) {
         aiSpeech = ` Air quality is ${aiCards[0].innerText}. For farmers: ${aiCards[1].innerText}. Fitness AI suggests ${aiCards[2].innerText}`;
     }
-
     const msg = new SpeechSynthesisUtterance(`Weather report for ${shortName}. It is ${temp}. ${aiSpeech}`);
     setFemaleVoice(msg);
     window.speechSynthesis.speak(msg);
@@ -612,3 +587,171 @@ function renderFavorites() {
         `).join("");
     }
 }
+
+
+function getForecast(city) {
+    const header = document.querySelector(".forecast-section h3");
+    if (header) header.innerText = "Weather Trends";
+
+    fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`)
+        .then(res => res.json())
+        .then(data => {
+            const hourlyContainer = document.getElementById("hourlyForecastContainer");
+            if (hourlyContainer) {
+                hourlyContainer.innerHTML = "";
+                
+                for (let i = 0; i < 24; i++) {
+                    const now = new Date();
+                    now.setHours(now.getHours() + i, 0, 0, 0);
+                    
+                    const hourTimestamp = now.getTime() / 1000;
+                    let prevBlock = data.list[0];
+                    let nextBlock = data.list[0];
+                    
+                    for (let j = 0; j < data.list.length - 1; j++) {
+                        if (hourTimestamp >= data.list[j].dt && hourTimestamp <= data.list[j+1].dt) {
+                            prevBlock = data.list[j];
+                            nextBlock = data.list[j+1];
+                            break;
+                        }
+                    }
+
+                    const totalDiff = nextBlock.dt - prevBlock.dt;
+                    const currentDiff = hourTimestamp - prevBlock.dt;
+                    const ratio = totalDiff === 0 ? 0 : currentDiff / totalDiff;
+                    
+                    const interpolatedTemp = prevBlock.main.temp + (nextBlock.main.temp - prevBlock.main.temp) * ratio;
+                    
+                    const time = now.getHours();
+                    const ampm = time >= 12 ? 'PM' : 'AM';
+                    const displayTime = time % 12 || 12;
+                    const label = (i === 0) ? "NOW" : `${displayTime}${ampm}`;
+
+                    hourlyContainer.innerHTML += `
+                        <div class="hourly-card">
+                            <h4>${label}</h4>
+                            <img src="https://openweathermap.org/img/wn/${prevBlock.weather[0].icon}.png">
+                            <p>${Math.round(interpolatedTemp)}°</p>
+                        </div>`;
+                }
+            }
+
+            const shelf = document.getElementById("forecastContainer");
+            shelf.innerHTML = "";
+            currentViewWeek = 0;
+            forecastData = data.list.filter(item => item.dt_txt.includes("12:00:00"));
+            renderForecastCards(forecastData);
+
+            const plusBox = document.createElement("div");
+            plusBox.className = "forecast-card plus-box";
+            plusBox.style.border = "2px dashed #3b82f6";
+            plusBox.style.cursor = "pointer";
+            plusBox.innerHTML = `<h4>+</h4><p>Next 7 Days</p>`;
+            plusBox.onclick = () => updateToNextWeek(city);
+            shelf.appendChild(plusBox);
+
+            drawWeatherGraph(forecastData.map(d => new Date(d.dt_txt).toLocaleDateString('en', {
+                weekday: 'short'
+            })), forecastData.map(d => Math.round(d.main.temp)));
+        });
+}
+
+
+
+let miviAssistant = null;
+
+function processMiviCommand(transcript) {
+    window.speechSynthesis.cancel(); 
+
+    let city = transcript.replace(/hey mivi|ok mivi|mivi|weather in|the weather in|search/g, "").trim();
+
+    if (city) {
+        const searchBar = document.getElementById("cityInput");
+        const status = document.getElementById("voiceStatus");
+        const displayCity = city.charAt(0).toUpperCase() + city.slice(1);
+        
+        searchBar.value = displayCity;
+        if (status) status.innerText = `Mivi: Recognized "${displayCity}"`;
+
+        speakMivi(`Updating location to ${displayCity}. Synchronizing Earth data.`);
+
+        setTimeout(() => {
+            getWeather(); 
+        }, 1200);
+    }
+}
+
+function voiceSearch() {
+    window.speechSynthesis.cancel();
+    if (miviAssistant) miviAssistant.stop(); 
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    const micBtn = document.getElementById("micButton");
+
+    recognition.onstart = () => {
+        micBtn.classList.add("listening"); 
+        document.getElementById("voiceStatus").innerText = "Listening for location...";
+    };
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript.toLowerCase();
+        processMiviCommand(transcript); 
+    };
+
+    recognition.onend = () => {
+        setTimeout(() => {
+            micBtn.classList.remove("listening");
+            if (miviAssistant) try { miviAssistant.start(); } catch(e){}
+        }, 1000);
+    };
+
+    recognition.start();
+}
+
+function startMiviAssistant() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    miviAssistant = new SpeechRecognition();
+    miviAssistant.continuous = true;
+    miviAssistant.lang = 'en-US';
+
+    miviAssistant.onresult = (event) => {
+        const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase().trim();
+        
+        if (transcript.includes("mivi") || transcript.includes("weather in")) {
+            processMiviCommand(transcript); 
+        }
+    };
+
+    miviAssistant.onend = () => {
+        setTimeout(() => { try { miviAssistant.start(); } catch(e){} }, 400);
+    };
+
+    miviAssistant.start();
+}
+
+function speakMivi(text) {
+    window.speechSynthesis.cancel(); 
+    const utterance = new SpeechSynthesisUtterance(text);
+    
+    if (typeof setFemaleVoice === "function") setFemaleVoice(utterance);
+
+    if (miviAssistant) miviAssistant.stop();
+    utterance.onend = () => { 
+        try { miviAssistant.start(); } catch(e) {} 
+    };
+
+    window.speechSynthesis.speak(utterance);
+}
+
+window.addEventListener('click', () => {
+    if (!miviAssistant) {
+        window.speechSynthesis.speak(new SpeechSynthesisUtterance("")); 
+        startMiviAssistant();
+        speakMivi("Mivi AI system is online. Hello Nani!");
+        const status = document.getElementById("voiceStatus");
+        if (status) status.innerText = "Mivi: Online & Listening";
+    }
+}, { once: true });
