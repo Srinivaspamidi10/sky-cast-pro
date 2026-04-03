@@ -311,7 +311,6 @@ async function fetchAQI(lat, lon) {
     }
 }
 
-// UPDATED getForecast to include Hourly Weather Report with specific styling
 function getForecast(city) {
     const header = document.querySelector(".forecast-section h3");
     if (header) header.innerText = "Weather Trends";
@@ -319,17 +318,15 @@ function getForecast(city) {
     fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`)
         .then(res => res.json())
         .then(data => {
-            // 1. Hourly Section (Next 24 Hours)
             const hourlyContainer = document.getElementById("hourlyForecastContainer");
             if (hourlyContainer) {
                 hourlyContainer.innerHTML = "";
-                const hourlyData = data.list.slice(0, 8); // Next 8 intervals (24 hours)
+                const hourlyData = data.list.slice(0, 8); 
                 hourlyData.forEach((item, index) => {
                     const time = new Date(item.dt * 1000).getHours();
                     const ampm = time >= 12 ? 'PM' : 'AM';
                     const displayTime = time % 12 || 12;
 
-                    // Specific label for current hour
                     const label = (index === 0) ? "NOW" : `${displayTime} ${ampm}`;
 
                     hourlyContainer.innerHTML += `
@@ -341,7 +338,6 @@ function getForecast(city) {
                 });
             }
 
-            // 2. Daily Section (Original 5-Day Trend)
             const shelf = document.getElementById("forecastContainer");
             shelf.innerHTML = "";
             currentViewWeek = 0;
@@ -573,7 +569,7 @@ function addWeatherAnimation(weather) {
 }
 
 function showGreeting() {
-    document.getElementById("greeting").innerText = new Date().getHours() < 12 ? "Good Morning, Nani" : "Good Day, Nani";
+    document.getElementById("greeting").innerText = new Date().getHours() < 12 ? "Good Morning, Srinivas" : "Good Day, Srinivas";
 }
 
 function renderFavorites() {
@@ -750,7 +746,7 @@ window.addEventListener('click', () => {
     if (!miviAssistant) {
         window.speechSynthesis.speak(new SpeechSynthesisUtterance("")); 
         startMiviAssistant();
-        speakMivi("Mivi AI system is online. Hello Nani!");
+        speakMivi("Mivi AI is Activated. Hello Srinivas! How can i help you today!");
         const status = document.getElementById("voiceStatus");
         if (status) status.innerText = "Mivi: Online & Listening";
     }
